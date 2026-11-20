@@ -8,20 +8,13 @@
 <title>Muscu Log</title>
 <style>
   :root {
-    --bg: #0f1115;
-    --card: #1a1d24;
-    --card2: #232733;
-    --accent: #ff5a36;
-    --text: #f2f4f8;
-    --muted: #8b93a3;
-    --ok: #2ecc71;
-    --danger: #e74c3c;
-    --radius: 18px;
+    --bg: #0f1115; --card: #1a1d24; --card2: #232733;
+    --accent: #ff5a36; --text: #f2f4f8; --muted: #8b93a3;
+    --ok: #2ecc71; --danger: #e74c3c; --radius: 18px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
-    margin: 0; height: 100%;
-    background: var(--bg); color: var(--text);
+    margin: 0; height: 100%; background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, sans-serif;
     overscroll-behavior: none;
   }
@@ -30,453 +23,356 @@
     padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 24px);
     display: flex; flex-direction: column;
   }
-  h1 { font-size: 26px; margin: 4px 0 4px; }
+  h1 { font-size: 26px; margin: 4px 0; }
   h2 { font-size: 22px; margin: 4px 0 14px; }
   .sub { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
   .topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
   .back {
     background: var(--card); border: 0; color: var(--text);
-    width: 42px; height: 42px; border-radius: 50%; font-size: 20px;
+    width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer;
   }
   button { font-family: inherit; color: var(--text); }
   .btn {
     width: 100%; padding: 16px; border: 0; border-radius: var(--radius);
     font-size: 17px; font-weight: 600; background: var(--accent); color: #fff;
-    margin-top: 12px;
+    cursor: pointer; margin-top: 10px;
   }
   .btn.secondary { background: var(--card2); color: var(--text); }
-  .btn.ok { background: var(--ok); color: #05210f; }
+  .btn.ok { background: var(--ok); color: #08210f; }
   .btn.danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
-  .btn:active { transform: scale(.98); opacity: .9; }
-
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .tile {
     background: var(--card); border: 0; border-radius: var(--radius);
-    padding: 18px 10px; display: flex; flex-direction: column; align-items: center;
-    gap: 10px; font-size: 16px; font-weight: 600;
+    padding: 18px 8px; display: flex; flex-direction: column; align-items: center;
+    gap: 8px; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 120px;
+    justify-content: center; text-align: center;
   }
   .tile:active { background: var(--card2); }
-  .tile svg { width: 56px; height: 56px; stroke: var(--accent); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .tile svg { width: 56px; height: 56px; }
   .list { display: flex; flex-direction: column; gap: 10px; }
   .row {
     background: var(--card); border: 0; border-radius: var(--radius);
     padding: 12px 14px; display: flex; align-items: center; gap: 14px;
-    font-size: 16px; font-weight: 600; text-align: left; width: 100%;
+    font-size: 16px; font-weight: 600; text-align: left; cursor: pointer; width: 100%;
   }
-  .row:active { background: var(--card2); }
-  .row svg { width: 40px; height: 40px; flex: none; stroke: var(--accent); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-  .row .grow { flex: 1; }
-  .row .chev { color: var(--muted); font-size: 20px; }
-
+  .row svg { width: 40px; height: 40px; flex-shrink: 0; }
   .card { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
-  .last { font-size: 13px; color: var(--muted); }
+  .last {
+    background: var(--card); border-radius: 12px; padding: 8px 12px;
+    font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.5;
+  }
   .last b { color: var(--text); }
-  .badge {
-    display: inline-block; background: var(--card2); border-radius: 10px;
-    padding: 3px 9px; margin: 2px 4px 2px 0; font-size: 12px; color: var(--text);
+  input[type=text], input[type=password], input[type=number] {
+    width: 100%; padding: 16px; font-size: 18px; border-radius: 14px;
+    border: 2px solid var(--card2); background: var(--card); color: var(--text); outline: none;
   }
-  .inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
-  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-  .field input {
-    width: 100%; font-size: 28px; font-weight: 700; text-align: center;
-    padding: 14px 6px; border-radius: 14px; border: 2px solid var(--card2);
-    background: var(--card); color: var(--text); outline: none;
+  input:focus { border-color: var(--accent); }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .setline {
+    display: flex; justify-content: space-between; padding: 8px 4px;
+    border-bottom: 1px solid var(--card2); font-size: 15px;
   }
-  .field input:focus { border-color: var(--accent); }
-  .setline { display: flex; justify-content: space-between; padding: 8px 4px; border-bottom: 1px solid var(--card2); font-size: 15px; }
   .setline:last-child { border-bottom: 0; }
-  .setline .x { color: var(--danger); background: none; border: 0; font-size: 16px; }
-  input.text, input.pw {
-    width: 100%; padding: 16px; font-size: 17px; border-radius: 14px;
-    border: 2px solid var(--card2); background: var(--card); color: var(--text); outline: none; margin-top: 10px;
-  }
-  input.text:focus, input.pw:focus { border-color: var(--accent); }
-  .err { color: var(--danger); font-size: 14px; margin-top: 10px; min-height: 18px; }
+  .err { color: var(--danger); font-size: 14px; min-height: 20px; margin-top: 8px; }
   .center { margin: auto 0; }
-  .empty { color: var(--muted); text-align: center; padding: 20px; font-size: 14px; }
   .spacer { flex: 1; }
-  .small-actions { display: flex; gap: 10px; }
-  .small-actions .btn { font-size: 14px; padding: 12px; }
+  .small { font-size: 12px; color: var(--muted); }
+  .pill { background: var(--accent); color: #fff; border-radius: 20px; padding: 2px 10px; font-size: 12px; }
 </style>
 </head>
 <body>
 <div id="app"></div>
 
 <script>
-/* ===================== CONFIG ===================== */
-// Hash SHA-256 du mot de passe. Par défaut : "muscu2026"
-// Pour changer : voir le README plus bas (ou changer le mot de passe dans l'app via ⚙️)
-const DEFAULT_PW_HASH = "PLACEHOLDER";
+/* ===================== ERREURS A L'ECRAN ===================== */
+function showError(msg) {
+  document.getElementById("app").innerHTML =
+    '<div style="padding:20px;color:#ff8a8a;font-size:14px;word-break:break-word"><b>Erreur :</b><br>' + msg + '</div>';
+}
+window.addEventListener("error", e => showError((e.message || e) + " (ligne " + e.lineno + ")"));
+window.addEventListener("unhandledrejection", e => showError(e.reason && e.reason.message || e.reason));
 
+/* ===================== CONFIG / DONNEES ===================== */
 const KEY_DATA = "muscu_data_v1";
-const KEY_PW = "muscu_pwhash_v1";
-const KEY_AUTH = "muscu_auth_v1";
+const KEY_PW = "muscu_pw_hash";
+const KEY_AUTH = "muscu_auth";
+const DEFAULT_PASSWORD = "muscu2026";
 
-/* ===================== ICONES SVG ===================== */
-const ICONS = {
-  pecs: '<svg viewBox="0 0 64 64"><path d="M32 14v34"/><path d="M32 18c-8-6-20-4-24 6-2 8 2 16 10 18 8 2 14-2 14-10"/><path d="M32 18c8-6 20-4 24 6 2 8-2 16-10 18-8 2-14-2-14-10"/></svg>',
-  dos: '<svg viewBox="0 0 64 64"><path d="M32 8v48"/><path d="M12 16l20 8 20-8"/><path d="M14 22c-4 12 0 24 8 30l10 4 10-4c8-6 12-18 8-30"/><path d="M22 34l10 6 10-6"/></svg>',
-  epaules: '<svg viewBox="0 0 64 64"><circle cx="32" cy="14" r="6"/><path d="M8 34c0-10 8-14 24-14s24 4 24 14"/><circle cx="12" cy="36" r="6"/><circle cx="52" cy="36" r="6"/><path d="M20 28v24h24V28"/></svg>',
-  biceps: '<svg viewBox="0 0 64 64"><path d="M14 46c-4-8-2-18 6-22 6-3 10-1 14 3 3 3 8 3 12 1 4-2 8 2 6 8-2 8-10 12-20 12-8 0-14-1-18-2z"/><path d="M26 34c2-4 8-4 10 0"/></svg>',
-  triceps: '<svg viewBox="0 0 64 64"><path d="M20 10c-4 10-6 22-2 34 2 6 8 10 14 10s12-4 14-10c4-12 2-24-2-34"/><path d="M32 18v28"/><path d="M24 24c-2 8 0 14 4 18"/><path d="M40 24c2 8 0 14-4 18"/></svg>',
-  jambes: '<svg viewBox="0 0 64 64"><path d="M22 6h20l-2 22-4 10-2 20h-8l-2-20-4-10z"/><path d="M28 28h8"/></svg>',
-  poulie: '<svg viewBox="0 0 64 64"><circle cx="32" cy="16" r="8"/><circle cx="32" cy="16" r="2"/><path d="M24 16v34"/><path d="M40 16v18"/><rect x="34" y="34" width="12" height="14" rx="2"/></svg>',
-  machine: '<svg viewBox="0 0 64 64"><rect x="10" y="48" width="44" height="6" rx="2"/><path d="M18 48V12h8v36"/><path d="M26 22h22"/><path d="M46 14v16"/><circle cx="46" cy="14" r="3"/></svg>',
-  halteres: '<svg viewBox="0 0 64 64"><rect x="6" y="22" width="8" height="20" rx="2"/><rect x="14" y="26" width="6" height="12" rx="1"/><rect x="50" y="22" width="8" height="20" rx="2"/><rect x="44" y="26" width="6" height="12" rx="1"/><path d="M20 32h24"/></svg>',
-  curl: '<svg viewBox="0 0 64 64"><path d="M12 54l14-14"/><path d="M26 40c-4-8 2-18 12-18 8 0 12 6 10 14"/><circle cx="44" cy="14" r="5"/><path d="M8 58h22"/></svg>',
-  cordes: '<svg viewBox="0 0 64 64"><circle cx="32" cy="10" r="4"/><path d="M32 14v10"/><path d="M32 24c-8 2-14 10-14 22"/><path d="M32 24c8 2 14 10 14 22"/><circle cx="18" cy="48" r="3"/><circle cx="46" cy="48" r="3"/></svg>',
-  jambe_machine: '<svg viewBox="0 0 64 64"><path d="M8 50h30"/><path d="M12 50l8-22 18-6"/><path d="M38 22l16 22"/><rect x="48" y="40" width="10" height="14" rx="2"/></svg>',
-  plus: '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22"/><path d="M32 20v24M20 32h24"/></svg>',
-  generic: '<svg viewBox="0 0 64 64"><rect x="6" y="22" width="8" height="20" rx="2"/><rect x="50" y="22" width="8" height="20" rx="2"/><path d="M14 32h36"/><rect x="18" y="26" width="5" height="12"/><rect x="41" y="26" width="5" height="12"/></svg>'
+const GROUPS = ["Pecs", "Dos", "Epaules", "Biceps", "Triceps", "Jambes"];
+const DEFAULT_EXOS = {
+  Pecs: ["chest press", "pec fly"],
+  Dos: ["lat pulldown", "low row"],
+  Epaules: ["shoulder press", "développé militaire assis", "élévations latérales poulie position 19", "élévations latérales poulie 45°"],
+  Biceps: ["incline curl poulie", "preacher curl"],
+  Triceps: ["extension poulie cordes"],
+  Jambes: ["leg press", "leg extension", "leg curl", "leg curl unilatéral"]
 };
 
-/* ===================== DONNEES PAR DEFAUT ===================== */
-const GROUPS = [
-  { id: "pecs", name: "Pecs" },
-  { id: "dos", name: "Dos" },
-  { id: "epaules", name: "Épaules" },
-  { id: "biceps", name: "Biceps" },
-  { id: "triceps", name: "Triceps" },
-  { id: "jambes", name: "Jambes" },
-];
+let data = { exos: {}, sessions: [] };
+// session = { date: "YYYY-MM-DD", entries: [ {group, exo, sets:[{reps,weight}]} ] }
 
-function defaultData() {
-  return {
-    exercises: {
-      pecs: [
-        { name: "Chest press", icon: "machine" },
-        { name: "Pec fly", icon: "machine" }
-      ],
-      dos: [
-        { name: "Lat pulldown", icon: "poulie" },
-        { name: "Low row", icon: "poulie" }
-      ],
-      epaules: [
-        { name: "Shoulder press", icon: "machine" },
-        { name: "Développé militaire assis", icon: "halteres" },
-        { name: "Élévations latérales poulie position 19", icon: "poulie" },
-        { name: "Élévations latérales poulie 45°", icon: "poulie" }
-      ],
-      biceps: [
-        { name: "Incline curl poulie", icon: "poulie" },
-        { name: "Preacher curl", icon: "curl" }
-      ],
-      triceps: [
-        { name: "Extension poulie cordes", icon: "cordes" }
-      ],
-      jambes: [
-        { name: "Leg press", icon: "jambe_machine" },
-        { name: "Leg extension", icon: "jambe_machine" },
-        { name: "Leg curl", icon: "jambe_machine" },
-        { name: "Leg curl unilatéral", icon: "jambe_machine" }
-      ]
-    },
-    // history: [{ date:"YYYY-MM-DD", group, exercise, sets:[{reps,weight}] }]
-    history: []
-  };
-}
-
-/* ===================== STOCKAGE ===================== */
-let data;
 function loadData() {
   try {
     const raw = localStorage.getItem(KEY_DATA);
-    data = raw ? JSON.parse(raw) : defaultData();
-  } catch (e) { data = defaultData(); }
+    if (raw) data = JSON.parse(raw);
+  } catch (e) { data = { exos: {}, sessions: [] }; }
+  if (!data.exos) data.exos = {};
+  if (!data.sessions) data.sessions = [];
+  GROUPS.forEach(g => { if (!data.exos[g]) data.exos[g] = DEFAULT_EXOS[g].slice(); });
 }
 function saveData() { localStorage.setItem(KEY_DATA, JSON.stringify(data)); }
 
-function todayStr() {
+function today() {
   const d = new Date();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const j = String(d.getDate()).padStart(2, "0");
-  return d.getFullYear() + "-" + m + "-" + j;
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
-function fmtDate(s) {
-  const [y, m, d] = s.split("-");
+function fmtDate(iso) {
+  const [y, m, d] = iso.split("-");
   return d + "/" + m + "/" + y;
 }
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "'" }[c]));
+}
 
-/* ===================== AUTH ===================== */
-async function sha256(txt) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+/* ===================== MOT DE PASSE ===================== */
+async function sha256(str) {
+  if (!(window.crypto && crypto.subtle)) {
+    // Repli simple si crypto.subtle est indisponible
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+    return "fb" + h;
+  }
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
-function getPwHash() { return localStorage.getItem(KEY_PW) || DEFAULT_PW_HASH; }
-function isAuth() { return sessionStorage.getItem(KEY_AUTH) === "1" || localStorage.getItem(KEY_AUTH) === "1"; }
+function isAuth() {
+  return localStorage.getItem(KEY_AUTH) === "1" || sessionStorage.getItem(KEY_AUTH) === "1";
+}
+
+/* ===================== ICONES SVG ===================== */
+const S = 'fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"';
+const ICONS = {
+  Pecs: `<svg viewBox="0 0 48 48" ${S} style="color:#ff5a36"><path d="M8 14c6-4 12-4 16 0 4-4 10-4 16 0v10c-4 8-10 10-16 6-6 4-12 2-16-6z"/><path d="M24 14v16"/></svg>`,
+  Dos: `<svg viewBox="0 0 48 48" ${S} style="color:#4da3ff"><path d="M6 10l18 6 18-6-4 18-14 10-14-10z"/><path d="M24 16v22"/></svg>`,
+  Epaules: `<svg viewBox="0 0 48 48" ${S} style="color:#ffc233"><circle cx="24" cy="16" r="6"/><path d="M6 38c0-10 8-14 18-14s18 4 18 14"/></svg>`,
+  Biceps: `<svg viewBox="0 0 48 48" ${S} style="color:#2ecc71"><path d="M8 34c0-10 6-18 14-18 4 0 6 3 10 3 6 0 10 4 10 10 0 6-6 8-12 8H14c-4 0-6-1-6-3z"/></svg>`,
+  Triceps: `<svg viewBox="0 0 48 48" ${S} style="color:#c77dff"><path d="M10 8c-2 12 0 22 8 30 8 0 16-4 20-14-4 2-8 0-10-4-2-4-2-8-4-12z"/></svg>`,
+  Jambes: `<svg viewBox="0 0 48 48" ${S} style="color:#ff7aa8"><path d="M18 6c-2 12 0 20 2 26l-2 10h8l2-10c2-6 4-14 0-26z"/></svg>`,
+  dumbbell: `<svg viewBox="0 0 48 48" ${S} style="color:#ff5a36"><path d="M6 18v12M12 14v20M36 14v20M42 18v12M12 24h24"/></svg>`,
+  cable: `<svg viewBox="0 0 48 48" ${S} style="color:#4da3ff"><rect x="8" y="6" width="6" height="36" rx="2"/><path d="M14 12h18l6 12"/><circle cx="38" cy="28" r="4"/></svg>`,
+  machine: `<svg viewBox="0 0 48 48" ${S} style="color:#ffc233"><rect x="8" y="30" width="32" height="8" rx="2"/><path d="M14 30V12h20v18M24 12V6"/></svg>`,
+  legs: `<svg viewBox="0 0 48 48" ${S} style="color:#ff7aa8"><path d="M6 36h36M10 36l10-14h10l8 14M20 22l-4-10"/></svg>`
+};
+function exoIcon(group, name) {
+  const n = name.toLowerCase();
+  if (n.includes("poulie") || n.includes("pulldown") || n.includes("row")) return ICONS.cable;
+  if (n.includes("leg")) return ICONS.legs;
+  if (n.includes("press") || n.includes("fly") || n.includes("curl") || n.includes("développé")) return ICONS.machine;
+  return ICONS.dumbbell;
+}
 
 /* ===================== ETAT / NAVIGATION ===================== */
 const app = document.getElementById("app");
-let state = { view: "login", group: null, exercise: null, sets: [], sessionStart: null };
+let state = { screen: "login", group: null, exo: null, sets: [], currentSession: null };
+function go(screen, extra) { Object.assign(state, extra || {}); state.screen = screen; render(); window.scrollTo(0, 0); }
 
-function go(view, extra = {}) {
-  Object.assign(state, { view }, extra);
-  render();
-  window.scrollTo(0, 0);
+function render() {
+  const fn = { login: vLogin, home: vHome, groups: vGroups, exos: vExos, perf: vPerf, history: vHistory, settings: vSettings }[state.screen];
+  fn();
 }
-const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "'" }[c]));
 
 /* ===================== VUES ===================== */
-function render() {
-  if (!isAuth() && state.view !== "login") state.view = "login";
-  const views = { login: vLogin, home: vHome, groups: vGroups, exercises: vExercises, perf: vPerf, settings: vSettings, history: vHistory };
-  views[state.view]();
-}
-
-/* ---- Login ---- */
 function vLogin() {
   app.innerHTML = `
     <div class="center">
-      <h1>🏋️ Muscu Log</h1>
-      <div class="sub">Entre ton mot de passe pour accéder à tes séances.</div>
-      <input class="pw" id="pw" type="password" placeholder="Mot de passe" autocomplete="current-password">
-      <div class="err" id="err"></div>
+      <div style="text-align:center;font-size:56px">🏋️</div>
+      <h1 style="text-align:center">Muscu Log</h1>
+      <p class="sub" style="text-align:center">Entre ton mot de passe</p>
+      <div class="field"><input type="password" id="pw" placeholder="Mot de passe" autocomplete="current-password"></div>
       <button class="btn" id="ok">Se connecter</button>
+      <div class="err" id="err"></div>
     </div>`;
-  const pw = document.getElementById("pw");
   const submit = async () => {
-    const h = await sha256(pw.value);
-    if (h === getPwHash()) {
-      localStorage.setItem(KEY_AUTH, "1"); // reste connecté sur cet appareil
-      go("home");
-    } else {
-      document.getElementById("err").textContent = "Mot de passe incorrect.";
-      pw.value = "";
-    }
+    const v = document.getElementById("pw").value;
+    const h = await sha256(v);
+    let stored = localStorage.getItem(KEY_PW);
+    if (!stored) { stored = await sha256(DEFAULT_PASSWORD); localStorage.setItem(KEY_PW, stored); }
+    if (h === stored) { localStorage.setItem(KEY_AUTH, "1"); go("home"); }
+    else document.getElementById("err").textContent = "Mot de passe incorrect.";
   };
   document.getElementById("ok").onclick = submit;
-  pw.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+  document.getElementById("pw").onkeydown = e => { if (e.key === "Enter") submit(); };
 }
 
-/* ---- Accueil ---- */
 function vHome() {
-  const today = todayStr();
-  const todays = data.history.filter(h => h.date === today);
+  const cs = state.currentSession;
+  const n = cs ? cs.entries.length : 0;
   app.innerHTML = `
-    <div class="topbar">
-      <div style="flex:1"><h1>🏋️ Muscu Log</h1><div class="sub" style="margin:0">${fmtDate(today)}</div></div>
-      <button class="back" id="set">⚙️</button>
-    </div>
-    <h2 style="margin-top:18px">Séance du jour</h2>
-    ${todays.length ? todays.map(h => `
-      <div class="card">
-        <b>${esc(h.exercise)}</b>
-        <div style="margin-top:6px">${h.sets.map(s => `<span class="badge">${s.reps} × ${s.weight} kg</span>`).join("")}</div>
-      </div>`).join("") : `<div class="empty">Aucun exercice enregistré aujourd'hui.</div>`}
-    <button class="btn" id="add">＋ Ajouter un exercice</button>
-    <button class="btn secondary" id="hist">📅 Historique</button>`;
-  document.getElementById("add").onclick = () => go("groups");
+    <h1>Muscu Log</h1>
+    <p class="sub">${fmtDate(today())}${n ? ' · <span class="pill">' + n + ' exo' + (n > 1 ? 's' : '') + '</span>' : ''}</p>
+    <button class="btn" id="add">➕ Ajouter un exercice</button>
+    ${n ? '<button class="btn ok" id="end">✅ Terminer la séance</button>' : ''}
+    <button class="btn secondary" id="hist">📜 Historique</button>
+    <button class="btn secondary" id="set">⚙️ Réglages</button>`;
+  document.getElementById("add").onclick = () => {
+    if (!state.currentSession) state.currentSession = { date: today(), entries: [] };
+    go("groups");
+  };
+  if (n) document.getElementById("end").onclick = () => { state.currentSession = null; go("home"); };
   document.getElementById("hist").onclick = () => go("history");
   document.getElementById("set").onclick = () => go("settings");
 }
 
-/* ---- Groupes musculaires ---- */
 function vGroups() {
   app.innerHTML = `
     <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">Groupe musculaire</h2></div>
-    <div class="grid" style="margin-top:12px">
-      ${GROUPS.map(g => `<button class="tile" data-g="${g.id}">${ICONS[g.id]}<span>${g.name}</span></button>`).join("")}
+    <div class="grid">
+      ${GROUPS.map(g => `<button class="tile" data-g="${g}">${ICONS[g]}<span>${g}</span></button>`).join("")}
     </div>`;
   document.getElementById("b").onclick = () => go("home");
-  app.querySelectorAll("[data-g]").forEach(b => b.onclick = () => go("exercises", { group: b.dataset.g }));
+  app.querySelectorAll(".tile").forEach(t => t.onclick = () => go("exos", { group: t.dataset.g }));
 }
 
-/* ---- Exercices d'un groupe ---- */
-function vExercises() {
-  const g = GROUPS.find(x => x.id === state.group);
-  const list = data.exercises[state.group] || [];
+function vExos() {
+  const g = state.group;
+  const list = data.exos[g];
   app.innerHTML = `
-    <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">${g.name}</h2></div>
-    <div class="list" style="margin-top:12px">
-      ${list.map((e, i) => `
-        <button class="row" data-i="${i}">
-          ${ICONS[e.icon] || ICONS.generic}
-          <span class="grow">${esc(e.name)}</span><span class="chev">›</span>
-        </button>`).join("")}
-      <button class="row" id="new">${ICONS.plus}<span class="grow">Ajouter un exercice</span></button>
+    <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">${g}</h2></div>
+    <div class="list">
+      ${list.map((e, i) => `<button class="row" data-i="${i}">${exoIcon(g, e)}<span>${esc(e)}</span></button>`).join("")}
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="field"><label>Nouvel exercice</label><input type="text" id="newex" placeholder="Nom de l'exercice"></div>
+      <button class="btn secondary" id="addex" style="margin-top:0">➕ Ajouter à ${g}</button>
     </div>`;
   document.getElementById("b").onclick = () => go("groups");
-  app.querySelectorAll("[data-i]").forEach(b => b.onclick = () => {
-    go("perf", { exercise: list[+b.dataset.i].name, sets: [], sessionStart: Date.now() });
-  });
-  document.getElementById("new").onclick = () => vNewExercise();
-}
-
-/* ---- Ajout d'un exercice personnalisé ---- */
-function vNewExercise() {
-  const g = GROUPS.find(x => x.id === state.group);
-  app.innerHTML = `
-    <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">Nouvel exercice</h2></div>
-    <div class="sub">Groupe : ${g.name}</div>
-    <input class="text" id="n" type="text" placeholder="Nom de l'exercice" autocomplete="off">
-    <div class="err" id="err"></div>
-    <button class="btn" id="ok">Ajouter</button>`;
-  document.getElementById("b").onclick = () => go("exercises");
-  const n = document.getElementById("n");
-  n.focus();
-  const submit = () => {
-    const name = n.value.trim();
-    if (!name) { document.getElementById("err").textContent = "Donne un nom à l'exercice."; return; }
-    const list = data.exercises[state.group];
-    if (list.some(e => e.name.toLowerCase() === name.toLowerCase())) {
-      document.getElementById("err").textContent = "Cet exercice existe déjà."; return;
-    }
-    list.push({ name, icon: "generic" });
-    saveData();
-    go("exercises");
+  app.querySelectorAll(".row").forEach(r => r.onclick = () => go("perf", { exo: list[+r.dataset.i], sets: [] }));
+  document.getElementById("addex").onclick = () => {
+    const v = document.getElementById("newex").value.trim();
+    if (!v) return;
+    if (!list.some(x => x.toLowerCase() === v.toLowerCase())) { list.push(v); saveData(); }
+    vExos();
   };
-  document.getElementById("ok").onclick = submit;
-  n.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
 }
 
-/* ---- Dernière performance (jour différent d'aujourd'hui) ---- */
-function lastPerf(exercise) {
-  const today = todayStr();
-  const past = data.history
-    .filter(h => h.exercise === exercise && h.date !== today)
-    .sort((a, b) => b.date.localeCompare(a.date));
-  return past[0] || null;
+function lastPerformance(exo) {
+  const t = today();
+  for (let i = data.sessions.length - 1; i >= 0; i--) {
+    const s = data.sessions[i];
+    if (s.date === t) continue;
+    for (let j = s.entries.length - 1; j >= 0; j--) {
+      if (s.entries[j].exo === exo) return { date: s.date, sets: s.entries[j].sets };
+    }
+  }
+  return null;
 }
 
-/* ---- Saisie de la performance ---- */
 function vPerf() {
-  const last = lastPerf(state.exercise);
-  const n = state.sets.length + 1;
-  const prev = state.sets[state.sets.length - 1];
+  const exo = state.exo;
+  const last = lastPerformance(exo);
+  const prev = state.sets.length ? state.sets[state.sets.length - 1] : null;
   app.innerHTML = `
-    <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0;font-size:19px">${esc(state.exercise)}</h2></div>
-
-    <div class="card last">
-      ${last ? `Dernière fois (<b>${fmtDate(last.date)}</b>) :<div style="margin-top:6px">${last.sets.map(s => `<span class="badge">${s.reps} × ${s.weight} kg</span>`).join("")}</div>`
-             : `Aucune performance précédente.`}
+    <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">${esc(exo)}</h2></div>
+    ${last ? `<div class="last">Dernière fois (${fmtDate(last.date)}) :<br><b>${last.sets.map(s => s.reps + "×" + s.weight + "kg").join(" · ")}</b></div>`
+           : `<div class="last">Pas d'historique pour cet exercice.</div>`}
+    <div class="card">
+      <div class="small" style="margin-bottom:8px">Série ${state.sets.length + 1}</div>
+      <div class="two">
+        <div class="field"><label>Répétitions</label><input type="number" inputmode="numeric" id="reps" placeholder="0"></div>
+        <div class="field"><label>Charge (kg)</label><input type="number" inputmode="decimal" step="0.5" id="w" placeholder="0" value="${prev ? prev.weight : ""}"></div>
+      </div>
+      <div class="err" id="err"></div>
     </div>
-
-    ${state.sets.length ? `<div class="card" id="done">
-      <div class="last" style="margin-bottom:4px">Séries validées</div>
-      ${state.sets.map((s, i) => `<div class="setline"><span>Série ${i + 1}</span><span><b>${s.reps}</b> × <b>${s.weight}</b> kg</span><button class="x" data-del="${i}">✕</button></div>`).join("")}
-    </div>` : ""}
-
-    <h2 style="margin-top:6px">Série ${n}</h2>
-    <div class="inputs">
-      <div class="field"><label>Répétitions</label><input id="reps" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="0"></div>
-      <div class="field"><label>Charge (kg)</label><input id="w" type="number" inputmode="decimal" step="0.5" min="0" placeholder="${prev ? prev.weight : 0}"></div>
-    </div>
-    <div class="err" id="err"></div>
-
-    <button class="btn" id="next">Série suivante</button>
-    <button class="btn ok" id="end">Terminer</button>`;
-
-  const reps = document.getElementById("reps");
-  const w = document.getElementById("w");
-  if (prev) w.value = prev.weight; // préremplit la charge précédente
-  reps.focus();
+    ${state.sets.length ? `<div class="card">${state.sets.map((s, i) => `<div class="setline"><span>Série ${i + 1}</span><b>${s.reps} × ${s.weight} kg</b></div>`).join("")}</div>` : ""}
+    <button class="btn secondary" id="next">➡️ Série suivante</button>
+    <button class="btn ok" id="done">✔️ Terminer</button>`;
+  document.getElementById("b").onclick = () => go("exos");
 
   const readSet = () => {
-    const r = parseInt(reps.value, 10);
-    const kg = parseFloat(String(w.value).replace(",", "."));
-    if (isNaN(r) || r <= 0 || isNaN(kg) || kg < 0) return null;
-    return { reps: r, weight: kg };
-  };
-
-  document.getElementById("b").onclick = () => {
-    if (state.sets.length && !confirm("Abandonner les séries non enregistrées ?")) return;
-    go("exercises");
-  };
-  app.querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
-    state.sets.splice(+b.dataset.del, 1); render();
-  });
-  document.getElementById("next").onclick = () => {
-    const s = readSet();
-    if (!s) { document.getElementById("err").textContent = "Renseigne les répétitions et la charge."; return; }
-    state.sets.push(s);
-    render();
-  };
-  document.getElementById("end").onclick = () => {
-    const s = readSet();
-    // Si des champs valides sont remplis, on compte la série en cours
-    if (s) state.sets.push(s);
-    else if (reps.value || w.value) {
-      document.getElementById("err").textContent = "Série incomplète : complète-la ou vide les champs."; return;
+    const reps = parseInt(document.getElementById("reps").value, 10);
+    const weight = parseFloat(String(document.getElementById("w").value).replace(",", "."));
+    if (!(reps > 0) || isNaN(weight) || weight < 0) {
+      document.getElementById("err").textContent = "Renseigne les répétitions et la charge.";
+      return null;
     }
-    if (!state.sets.length) { document.getElementById("err").textContent = "Aucune série à enregistrer."; return; }
-    data.history.push({ date: todayStr(), group: state.group, exercise: state.exercise, sets: state.sets.slice() });
+    return { reps, weight };
+  };
+  document.getElementById("next").onclick = () => {
+    const s = readSet(); if (!s) return;
+    state.sets.push(s); vPerf();
+  };
+  document.getElementById("done").onclick = () => {
+    const repsEl = document.getElementById("reps").value;
+    if (repsEl !== "") { const s = readSet(); if (!s) return; state.sets.push(s); }
+    if (!state.sets.length) { document.getElementById("err").textContent = "Aucune série saisie."; return; }
+    const cs = state.currentSession || (state.currentSession = { date: today(), entries: [] });
+    cs.entries.push({ group: state.group, exo: state.exo, sets: state.sets });
+    let sess = data.sessions.find(s => s.date === cs.date);
+    if (!sess) { sess = { date: cs.date, entries: [] }; data.sessions.push(sess); }
+    sess.entries.push({ group: state.group, exo: state.exo, sets: state.sets });
     saveData();
-    state.sets = [];
-    go("groups");
+    go("groups", { sets: [] });
   };
 }
 
-/* ---- Historique ---- */
 function vHistory() {
-  const byDate = {};
-  data.history.forEach(h => (byDate[h.date] = byDate[h.date] || []).push(h));
-  const dates = Object.keys(byDate).sort().reverse();
+  const sessions = data.sessions.slice().reverse();
   app.innerHTML = `
     <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">Historique</h2></div>
-    ${dates.length ? dates.map(d => `
-      <div class="sub" style="margin:14px 0 6px"><b>${fmtDate(d)}</b></div>
-      ${byDate[d].map(h => `<div class="card"><b>${esc(h.exercise)}</b>
-        <div style="margin-top:6px">${h.sets.map(s => `<span class="badge">${s.reps} × ${s.weight} kg</span>`).join("")}</div></div>`).join("")}
-    `).join("") : `<div class="empty">Pas encore de séance enregistrée.</div>`}`;
+    ${sessions.length ? sessions.map(s => `
+      <div class="card">
+        <b>${fmtDate(s.date)}</b>
+        ${s.entries.map(e => `
+          <div style="margin-top:10px"><span style="font-weight:600">${esc(e.exo)}</span> <span class="small">(${e.group})</span>
+          <div class="small">${e.sets.map(x => x.reps + "×" + x.weight + "kg").join(" · ")}</div></div>`).join("")}
+      </div>`).join("") : '<p class="sub">Aucune séance enregistrée.</p>'}`;
   document.getElementById("b").onclick = () => go("home");
 }
 
-/* ---- Réglages ---- */
 function vSettings() {
   app.innerHTML = `
     <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">Réglages</h2></div>
-
     <div class="card">
-      <b>Sauvegarde des données</b>
-      <div class="sub" style="margin:6px 0 0">Tes données sont stockées uniquement dans ce navigateur. Exporte-les régulièrement.</div>
-      <div class="small-actions">
-        <button class="btn secondary" id="exp">Exporter</button>
-        <button class="btn secondary" id="imp">Importer</button>
-      </div>
+      <div class="field"><label>Nouveau mot de passe</label><input type="password" id="np" placeholder="Min. 4 caractères"></div>
+      <button class="btn secondary" id="chg" style="margin-top:0">Changer le mot de passe</button>
+      <div class="err" id="err"></div>
+    </div>
+    <div class="card">
+      <button class="btn secondary" id="exp" style="margin-top:0">⬇️ Exporter mes données</button>
+      <button class="btn secondary" id="imp">⬆️ Importer des données</button>
       <input type="file" id="file" accept="application/json" style="display:none">
     </div>
-
-    <div class="card">
-      <b>Changer le mot de passe</b>
-      <input class="pw" id="np" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password">
-      <div class="err" id="err"></div>
-      <button class="btn secondary" id="chg" style="margin-top:0">Modifier</button>
-    </div>
-
     <button class="btn danger" id="out">Se déconnecter</button>`;
-
   document.getElementById("b").onclick = () => go("home");
-
-  document.getElementById("exp").onclick = () => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "muscu-backup-" + todayStr() + ".json";
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-  };
-  const file = document.getElementById("file");
-  document.getElementById("imp").onclick = () => file.click();
-  file.onchange = () => {
-    const f = file.files[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = () => {
-      try {
-        const d = JSON.parse(r.result);
-        if (!d.exercises || !d.history) throw new Error();
-        if (confirm("Remplacer toutes les données actuelles par ce fichier ?")) {
-          data = d; saveData(); alert("Import réussi."); go("home");
-        }
-      } catch (e) { alert("Fichier invalide."); }
-    };
-    r.readAsText(f);
-  };
   document.getElementById("chg").onclick = async () => {
     const v = document.getElementById("np").value;
     if (v.length < 4) { document.getElementById("err").textContent = "Minimum 4 caractères."; return; }
     localStorage.setItem(KEY_PW, await sha256(v));
     alert("Mot de passe modifié.");
     document.getElementById("np").value = "";
+  };
+  document.getElementById("exp").onclick = () => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "muscu-log-" + today() + ".json";
+    a.click();
+  };
+  document.getElementById("imp").onclick = () => document.getElementById("file").click();
+  document.getElementById("file").onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result);
+        if (!d.sessions || !d.exos) throw new Error("Format invalide");
+        data = d; loadData(); saveData();
+        alert("Import réussi.");
+      } catch (err) { alert("Fichier invalide."); }
+    };
+    r.readAsText(f);
   };
   document.getElementById("out").onclick = () => {
     localStorage.removeItem(KEY_AUTH); sessionStorage.removeItem(KEY_AUTH);
@@ -485,31 +381,13 @@ function vSettings() {
 }
 
 /* ===================== DEMARRAGE ===================== */
-// Affiche les erreurs à l'écran pour faciliter le diagnostic
-window.addEventListener("error", e => {
-  document.getElementById("app").innerHTML =
-    '<div style="padding:20px;color:#ff8a8a;font-size:14px;word-break:break-word">' +
-    '<b>Erreur JS :</b><br>' + (e.message || e) + '<br><small>ligne ' + e.lineno + '</small></div>';
-});
-window.addEventListener("unhandledrejection", e => {
-  document.getElementById("app").innerHTML =
-    '<div style="padding:20px;color:#ff8a8a;font-size:14px;word-break:break-word">' +
-    '<b>Erreur :</b><br>' + (e.reason && e.reason.message || e.reason) + '</div>';
-});
-
 (async function init() {
   try {
-    if (!localStorage.getItem(KEY_PW)) {
-      if (window.crypto && crypto.subtle) {
-        localStorage.setItem(KEY_PW, await sha256("muscu2026"));
-      } else {
-        throw new Error("crypto.subtle indisponible : la page doit être servie en HTTPS.");
-      }
-    }
+    if (!localStorage.getItem(KEY_PW)) localStorage.setItem(KEY_PW, await sha256(DEFAULT_PASSWORD));
     loadData();
     go(isAuth() ? "home" : "login");
   } catch (err) {
-    app.innerHTML = '<div style="padding:20px;color:#ff8a8a">Erreur : ' + err.message + '</div>';
+    showError(err.message);
   }
 })();
 </script>
