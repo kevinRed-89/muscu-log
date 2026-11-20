@@ -485,11 +485,32 @@ function vSettings() {
 }
 
 /* ===================== DEMARRAGE ===================== */
+// Affiche les erreurs à l'écran pour faciliter le diagnostic
+window.addEventListener("error", e => {
+  document.getElementById("app").innerHTML =
+    '<div style="padding:20px;color:#ff8a8a;font-size:14px;word-break:break-word">' +
+    '<b>Erreur JS :</b><br>' + (e.message || e) + '<br><small>ligne ' + e.lineno + '</small></div>';
+});
+window.addEventListener("unhandledrejection", e => {
+  document.getElementById("app").innerHTML =
+    '<div style="padding:20px;color:#ff8a8a;font-size:14px;word-break:break-word">' +
+    '<b>Erreur :</b><br>' + (e.reason && e.reason.message || e.reason) + '</div>';
+});
+
 (async function init() {
-  // Initialise le hash par défaut du mot de passe "muscu2026" au premier lancement
-  if (!localStorage.getItem(KEY_PW)) localStorage.setItem(KEY_PW, await sha256("muscu2026"));
-  loadData();
-  go(isAuth() ? "home" : "login");
+  try {
+    if (!localStorage.getItem(KEY_PW)) {
+      if (window.crypto && crypto.subtle) {
+        localStorage.setItem(KEY_PW, await sha256("muscu2026"));
+      } else {
+        throw new Error("crypto.subtle indisponible : la page doit être servie en HTTPS.");
+      }
+    }
+    loadData();
+    go(isAuth() ? "home" : "login");
+  } catch (err) {
+    app.innerHTML = '<div style="padding:20px;color:#ff8a8a">Erreur : ' + err.message + '</div>';
+  }
 })();
 </script>
 </body>
