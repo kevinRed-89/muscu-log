@@ -83,7 +83,8 @@
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app"><p style="padding:20px;color:#8b93a3">Chargement…</p></div>
+<noscript><p style="padding:20px;color:#ff8a8a">JavaScript est désactivé.</p></noscript>
 
 <script>
 /* ===================== ERREURS A L'ECRAN ===================== */
@@ -122,7 +123,9 @@ function loadData() {
   if (!data.sessions) data.sessions = [];
   GROUPS.forEach(g => { if (!data.exos[g]) data.exos[g] = DEFAULT_EXOS[g].slice(); });
 }
-function saveData() { localStorage.setItem(KEY_DATA, JSON.stringify(data)); }
+function saveData() {
+  try { localStorage.setItem(KEY_DATA, JSON.stringify(data)); } catch (e) {}
+}
 
 function today() {
   const d = new Date();
@@ -133,7 +136,15 @@ function fmtDate(iso) {
   return d + "/" + m + "/" + y;
 }
 function esc(s) {
-  return String(s).replace(/[&<>"']/g, c => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "'" }[c]));
+  return String(s).replace(/[&<>"']/g, function (c) {
+    switch (c) {
+      case "&": return "&" + "amp;";
+      case "<": return "&" + "lt;";
+      case ">": return "&" + "gt;";
+      case '"': return "&" + "quot;";
+      default:  return "&" + "#39;";
+    }
+  });
 }
 
 /* ===================== MOT DE PASSE ===================== */
@@ -148,7 +159,9 @@ async function sha256(str) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 function isAuth() {
-  return localStorage.getItem(KEY_AUTH) === "1" || sessionStorage.getItem(KEY_AUTH) === "1";
+  try {
+    return localStorage.getItem(KEY_AUTH) === "1" || sessionStorage.getItem(KEY_AUTH) === "1";
+  } catch (e) { return false; }
 }
 
 /* ===================== ICONES SVG ===================== */
@@ -179,7 +192,8 @@ let state = { screen: "login", group: null, exo: null, sets: [], currentSession:
 function go(screen, extra) { Object.assign(state, extra || {}); state.screen = screen; render(); window.scrollTo(0, 0); }
 
 function render() {
-  const fn = { login: vLogin, home: vHome, groups: vGroups, exos: vExos, perf: vPerf, history: vHistory, settings: vSettings }[state.screen];
+  const views = { login: vLogin, home: vHome, groups: vGroups, exos: vExos, perf: vPerf, history: vHistory, settings: vSettings };
+  const fn = views[state.screen] || vLogin;
   fn();
 }
 
