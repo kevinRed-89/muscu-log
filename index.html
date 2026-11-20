@@ -61,25 +61,54 @@
     background: var(--card); border-radius: 12px; padding: 8px 12px;
     font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.5;
   }
+  .last.clickable { cursor: pointer; border: 1px dashed var(--card2); }
   .last b { color: var(--text); }
-  input[type=text], input[type=password], input[type=number] {
+  .last .notes { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--card2); color: var(--text); }
+  .last .notes div { margin-bottom: 4px; }
+  .hint { color: var(--accent); font-size: 11px; margin-top: 4px; }
+  input[type=text], input[type=password], input[type=number], textarea {
     width: 100%; padding: 16px; font-size: 18px; border-radius: 14px;
     border: 2px solid var(--card2); background: var(--card); color: var(--text); outline: none;
+    font-family: inherit;
   }
-  input:focus { border-color: var(--accent); }
+  textarea { font-size: 15px; padding: 12px; resize: none; }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  input:disabled { opacity: .35; }
   .field { margin-bottom: 14px; }
   .field label { display: block; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .setline {
     display: flex; justify-content: space-between; padding: 8px 4px;
-    border-bottom: 1px solid var(--card2); font-size: 15px;
+    border-bottom: 1px solid var(--card2); font-size: 15px; gap: 10px;
   }
   .setline:last-child { border-bottom: 0; }
+  .setnote { font-size: 12px; color: var(--muted); padding: 0 4px 6px; font-style: italic; }
   .err { color: var(--danger); font-size: 14px; min-height: 20px; margin-top: 8px; }
   .center { margin: auto 0; }
   .spacer { flex: 1; }
   .small { font-size: 12px; color: var(--muted); }
   .pill { background: var(--accent); color: #fff; border-radius: 20px; padding: 2px 10px; font-size: 12px; }
+  .dropline { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 15px; cursor: pointer; }
+  .dropline input { width: 22px; height: 22px; accent-color: var(--accent); }
+  .tag { background: #c77dff; color: #1a0a26; border-radius: 6px; padding: 1px 8px; font-size: 12px; font-weight: 700; }
+  .chartbox { background: var(--card); border-radius: 12px; padding: 8px 10px; margin-bottom: 14px; cursor: pointer; }
+  .chartbox .small { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .chartbox svg { width: 100%; height: 70px; display: block; }
+  .histhead { display: flex; justify-content: space-between; align-items: center; }
+  .del {
+    background: transparent; border: 1px solid var(--danger); color: var(--danger);
+    border-radius: 10px; padding: 4px 10px; font-size: 14px; cursor: pointer;
+  }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .overlay .modal {
+    background: var(--card); border-radius: var(--radius); padding: 16px;
+    width: 100%; max-width: 520px;
+  }
+  .overlay .modal svg { width: 100%; height: 300px; display: block; }
+  .overlay h3 { margin: 0 0 10px; font-size: 17px; }
 </style>
 </head>
 <body>
@@ -112,7 +141,7 @@ const DEFAULT_EXOS = {
 };
 
 let data = { exos: {}, sessions: [] };
-// session = { date: "YYYY-MM-DD", entries: [ {group, exo, sets:[{reps,weight}]} ] }
+// session = { date, entries: [ {group, exo, sets:[{reps,weight,note?,dropset?}]} ] }
 
 function loadData() {
   try {
@@ -146,11 +175,13 @@ function esc(s) {
     }
   });
 }
+function fmtSet(s) {
+  return s.dropset ? "Dropset" : s.reps + "×" + s.weight + "kg";
+}
 
 /* ===================== MOT DE PASSE ===================== */
 async function sha256(str) {
   if (!(window.crypto && crypto.subtle)) {
-    // Repli simple si crypto.subtle est indisponible
     let h = 5381;
     for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
     return "fb" + h;
@@ -188,7 +219,7 @@ function exoIcon(group, name) {
 
 /* ===================== ETAT / NAVIGATION ===================== */
 const app = document.getElementById("app");
-let state = { screen: "login", group: null, exo: null, sets: [], currentSession: null };
+let state = { screen: "login", group: null, exo: null, sets: [], currentSession: null, showNotes: false };
 function go(screen, extra) { Object.assign(state, extra || {}); state.screen = screen; render(); window.scrollTo(0, 0); }
 
 function render() {
@@ -262,7 +293,7 @@ function vExos() {
       <button class="btn secondary" id="addex" style="margin-top:0">➕ Ajouter à ${g}</button>
     </div>`;
   document.getElementById("b").onclick = () => go("groups");
-  app.querySelectorAll(".row").forEach(r => r.onclick = () => go("perf", { exo: list[+r.dataset.i], sets: [] }));
+  app.querySelectorAll(".row").forEach(r => r.onclick = () => go("perf", { exo: list[+r.dataset.i], sets: [], showNotes: false }));
   document.getElementById("addex").onclick = () => {
     const v = document.getElementById("newex").value.trim();
     if (!v) return;
@@ -271,78 +302,181 @@ function vExos() {
   };
 }
 
+/* Dernière performance : on ignore uniquement la séance en cours (pas la date du jour).
+   Dès que la séance est terminée (currentSession = null), tout est visible, même le même jour. */
 function lastPerformance(exo) {
-  const t = today();
+  const cs = state.currentSession;
   for (let i = data.sessions.length - 1; i >= 0; i--) {
     const s = data.sessions[i];
-    if (s.date === t) continue;
     for (let j = s.entries.length - 1; j >= 0; j--) {
-      if (s.entries[j].exo === exo) return { date: s.date, sets: s.entries[j].sets };
+      const e = s.entries[j];
+      if (e.exo !== exo) continue;
+      if (cs && e === e._skip) continue;
+      if (cs && e.sid === cs.id) continue; // entrée appartenant à la séance en cours
+      return { date: s.date, sets: e.sets };
     }
   }
   return null;
+}
+
+/* Progression : meilleure charge (hors dropset) par séance pour un exo */
+function progressionPoints(exo) {
+  const pts = [];
+  data.sessions.forEach(s => {
+    let best = null;
+    s.entries.forEach(e => {
+      if (e.exo !== exo) return;
+      e.sets.forEach(x => {
+        if (x.dropset) return;
+        if (best === null || x.weight > best) best = x.weight;
+      });
+    });
+    if (best !== null) pts.push({ date: s.date, v: best });
+  });
+  return pts;
+}
+
+function chartSVG(pts, big) {
+  if (!pts.length) return '<div class="small" style="padding:20px;text-align:center">Pas encore de données</div>';
+  const W = 300, H = big ? 200 : 70, P = big ? 28 : 8;
+  const vals = pts.map(p => p.v);
+  let min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+  if (min === max) { min -= 1; max += 1; }
+  const x = i => pts.length === 1 ? W / 2 : P + i * (W - 2 * P) / (pts.length - 1);
+  const y = v => H - P - (v - min) / (max - min) * (H - 2 * P);
+  const line = pts.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.v).toFixed(1)).join(" ");
+  let extra = "";
+  if (big) {
+    extra += `<text x="2" y="${y(max) + 4}" fill="#8b93a3" font-size="10">${max}</text>`;
+    extra += `<text x="2" y="${y(min) + 4}" fill="#8b93a3" font-size="10">${min}</text>`;
+    extra += `<text x="${P}" y="${H - 6}" fill="#8b93a3" font-size="9">${fmtDate(pts[0].date).slice(0, 5)}</text>`;
+    extra += `<text x="${W - P}" y="${H - 6}" fill="#8b93a3" font-size="9" text-anchor="end">${fmtDate(pts[pts.length - 1].date).slice(0, 5)}</text>`;
+    extra += pts.map((p, i) => `<text x="${x(i)}" y="${y(p.v) - 7}" fill="#f2f4f8" font-size="9" text-anchor="middle">${p.v}</text>`).join("");
+  }
+  const dots = pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${big ? 3.5 : 2.5}" fill="#ff5a36"/>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" ${big ? 'style="height:300px"' : ''}>
+    <path d="${line}" fill="none" stroke="#ff5a36" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    ${dots}${extra}</svg>`;
+}
+
+function openChart(exo) {
+  const pts = progressionPoints(exo);
+  const ov = document.createElement("div");
+  ov.className = "overlay";
+  ov.innerHTML = `<div class="modal"><h3>${esc(exo)} — charge max par séance (kg)</h3>${chartSVG(pts, true)}
+    <button class="btn secondary" style="margin-top:12px">Fermer</button></div>`;
+  ov.onclick = e => { if (e.target === ov || e.target.tagName === "BUTTON") ov.remove(); };
+  document.body.appendChild(ov);
 }
 
 function vPerf() {
   const exo = state.exo;
   const last = lastPerformance(exo);
   const prev = state.sets.length ? state.sets[state.sets.length - 1] : null;
+  const prevWeight = prev && !prev.dropset ? prev.weight : "";
+  const notes = last ? last.sets.map((s, i) => s.note ? `<div><b>Série ${i + 1} :</b> ${esc(s.note)}</div>` : "").join("") : "";
+  const hasNotes = notes !== "";
+  const pts = progressionPoints(exo);
+
   app.innerHTML = `
     <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">${esc(exo)}</h2></div>
-    ${last ? `<div class="last">Dernière fois (${fmtDate(last.date)}) :<br><b>${last.sets.map(s => s.reps + "×" + s.weight + "kg").join(" · ")}</b></div>`
+    ${last ? `<div class="last${hasNotes ? " clickable" : ""}" id="lastbox">Dernière fois (${fmtDate(last.date)}) :<br><b>${last.sets.map(fmtSet).join(" · ")}</b>
+        ${hasNotes ? `<div class="hint">${state.showNotes ? "▲ Masquer les notes" : "▼ Voir les notes"}</div>` : ""}
+        ${hasNotes && state.showNotes ? `<div class="notes">${notes}</div>` : ""}</div>`
            : `<div class="last">Pas d'historique pour cet exercice.</div>`}
+    <div class="chartbox" id="chart">
+      <div class="small"><span>Progression (charge max)</span><span>🔍 agrandir</span></div>
+      ${chartSVG(pts, false)}
+    </div>
     <div class="card">
       <div class="small" style="margin-bottom:8px">Série ${state.sets.length + 1}</div>
+      <label class="dropline"><input type="checkbox" id="drop"> Dropset</label>
       <div class="two">
         <div class="field"><label>Répétitions</label><input type="number" inputmode="numeric" id="reps" placeholder="0"></div>
-        <div class="field"><label>Charge (kg)</label><input type="number" inputmode="decimal" step="0.5" id="w" placeholder="0" value="${prev ? prev.weight : ""}"></div>
+        <div class="field"><label>Charge (kg)</label><input type="number" inputmode="decimal" step="0.5" id="w" placeholder="0" value="${prevWeight}"></div>
       </div>
+      <div class="field" style="margin-bottom:0"><label>Note (optionnel)</label><textarea id="note" rows="2" placeholder="Ressenti, réglage machine…"></textarea></div>
       <div class="err" id="err"></div>
     </div>
-    ${state.sets.length ? `<div class="card">${state.sets.map((s, i) => `<div class="setline"><span>Série ${i + 1}</span><b>${s.reps} × ${s.weight} kg</b></div>`).join("")}</div>` : ""}
+    ${state.sets.length ? `<div class="card">${state.sets.map((s, i) => `
+      <div class="setline"><span>Série ${i + 1}</span><b>${s.dropset ? '<span class="tag">Dropset</span>' : s.reps + " × " + s.weight + " kg"}</b></div>
+      ${s.note ? `<div class="setnote">${esc(s.note)}</div>` : ""}`).join("")}</div>` : ""}
     <button class="btn secondary" id="next">➡️ Série suivante</button>
     <button class="btn ok" id="done">✔️ Terminer</button>`;
+
   document.getElementById("b").onclick = () => go("exos");
+  document.getElementById("chart").onclick = () => openChart(exo);
+  if (hasNotes) document.getElementById("lastbox").onclick = () => { state.showNotes = !state.showNotes; vPerf(); };
+
+  const dropEl = document.getElementById("drop");
+  const repsEl = document.getElementById("reps");
+  const wEl = document.getElementById("w");
+  dropEl.onchange = () => {
+    repsEl.disabled = wEl.disabled = dropEl.checked;
+    if (dropEl.checked) { repsEl.value = ""; wEl.value = ""; }
+    else wEl.value = prevWeight;
+  };
 
   const readSet = () => {
-    const reps = parseInt(document.getElementById("reps").value, 10);
-    const weight = parseFloat(String(document.getElementById("w").value).replace(",", "."));
+    const note = document.getElementById("note").value.trim();
+    if (dropEl.checked) {
+      const s = { dropset: true, reps: 0, weight: 0 };
+      if (note) s.note = note;
+      return s;
+    }
+    const reps = parseInt(repsEl.value, 10);
+    const weight = parseFloat(String(wEl.value).replace(",", "."));
     if (!(reps > 0) || isNaN(weight) || weight < 0) {
-      document.getElementById("err").textContent = "Renseigne les répétitions et la charge.";
+      document.getElementById("err").textContent = "Renseigne les répétitions et la charge (ou coche Dropset).";
       return null;
     }
-    return { reps, weight };
+    const s = { reps, weight };
+    if (note) s.note = note;
+    return s;
   };
   document.getElementById("next").onclick = () => {
     const s = readSet(); if (!s) return;
     state.sets.push(s); vPerf();
   };
   document.getElementById("done").onclick = () => {
-    const repsEl = document.getElementById("reps").value;
-    if (repsEl !== "") { const s = readSet(); if (!s) return; state.sets.push(s); }
+    const hasInput = dropEl.checked || repsEl.value !== "";
+    if (hasInput) { const s = readSet(); if (!s) return; state.sets.push(s); }
     if (!state.sets.length) { document.getElementById("err").textContent = "Aucune série saisie."; return; }
     const cs = state.currentSession || (state.currentSession = { date: today(), entries: [] });
+    if (!cs.id) cs.id = "s" + Date.now();
     cs.entries.push({ group: state.group, exo: state.exo, sets: state.sets });
-    let sess = data.sessions.find(s => s.date === cs.date);
-    if (!sess) { sess = { date: cs.date, entries: [] }; data.sessions.push(sess); }
-    sess.entries.push({ group: state.group, exo: state.exo, sets: state.sets });
+    let sess = data.sessions.find(s => s.sid === cs.id);
+    if (!sess) { sess = { sid: cs.id, date: cs.date, entries: [] }; data.sessions.push(sess); }
+    sess.entries.push({ group: state.group, exo: state.exo, sets: state.sets, sid: cs.id });
     saveData();
     go("groups", { sets: [] });
   };
 }
 
 function vHistory() {
-  const sessions = data.sessions.slice().reverse();
+  const sessions = data.sessions.map((s, idx) => ({ s, idx })).reverse();
   app.innerHTML = `
     <div class="topbar"><button class="back" id="b">←</button><h2 style="margin:0">Historique</h2></div>
-    ${sessions.length ? sessions.map(s => `
+    ${sessions.length ? sessions.map(o => `
       <div class="card">
-        <b>${fmtDate(s.date)}</b>
-        ${s.entries.map(e => `
+        <div class="histhead"><b>${fmtDate(o.s.date)}</b><button class="del" data-i="${o.idx}">🗑 Supprimer</button></div>
+        ${o.s.entries.map(e => `
           <div style="margin-top:10px"><span style="font-weight:600">${esc(e.exo)}</span> <span class="small">(${e.group})</span>
-          <div class="small">${e.sets.map(x => x.reps + "×" + x.weight + "kg").join(" · ")}</div></div>`).join("")}
+          <div class="small">${e.sets.map(fmtSet).join(" · ")}</div>
+          ${e.sets.some(x => x.note) ? `<div class="small" style="font-style:italic">${e.sets.map((x, i) => x.note ? "S" + (i + 1) + " : " + esc(x.note) : "").filter(Boolean).join(" | ")}</div>` : ""}
+          </div>`).join("")}
       </div>`).join("") : '<p class="sub">Aucune séance enregistrée.</p>'}`;
   document.getElementById("b").onclick = () => go("home");
+  app.querySelectorAll(".del").forEach(btn => btn.onclick = () => {
+    const i = +btn.dataset.i;
+    const s = data.sessions[i];
+    if (!confirm("Supprimer la séance du " + fmtDate(s.date) + " ?")) return;
+    // si c'est la séance en cours, on la réinitialise aussi
+    if (state.currentSession && state.currentSession.id === s.sid) state.currentSession = null;
+    data.sessions.splice(i, 1);
+    saveData();
+    vHistory();
+  });
 }
 
 function vSettings() {
